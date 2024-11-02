@@ -1,0 +1,23 @@
+
+services:
+  sqlDatabase:
+      image: mcr.microsoft.com/mssql/server
+      container_name: mssql_reservation
+      hostname: mssql
+      environment:
+        ACCEPT_EULA: "Y"
+        MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+        MSSQL_TRUST_SERVER_CERTIFICATE: "True"
+      env_file:
+        - .env
+      ports:
+        - "1433:1433"
+      volumes:
+        - ./init.sql:/init.sql
+      entrypoint:
+        - /bin/bash
+        - -c
+        - |
+          /opt/mssql/bin/sqlservr & sleep 30
+          /opt/mssql-tools18/bin/sqlcmd -U sa -P $MSSQL_SA_PASSWORD -d master -C -i /init.sql
+          sleep infinity

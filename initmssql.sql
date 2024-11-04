@@ -9,14 +9,11 @@ USE Reservations;
 -- Create the RequestResults table
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'RequestResults')
 BEGIN
-    CREATE TABLE RequestResults (
-        Id INT IDENTITY(1,1) PRIMARY KEY,
-        ClientName NVARCHAR(255),
-        ClientPhone NVARCHAR(50),
-        TableNumber SMALLINT,
-        DateOfReservation DATE,
-        Status TINYINT CHECK (Status IN (0, 1)), -- 0 not valid, 1 for valid
-        Raw NVARCHAR(MAX)
+   CREATE TABLE RequestResults (
+        Id INT IDENTITY(1,1) PRIMARY KEY,    
+        Raw VARCHAR(MAX),
+        DT DATETIME2,
+        ValidationResult  INT -- 0:Fail -9:OK       
     );
 END;
 GO
@@ -30,20 +27,17 @@ END;
 GO
 
 CREATE PROCEDURE sp_InsertRequestResult
-    @clientName NVARCHAR(255),
-    @clientPhone NVARCHAR(50),
-    @TableNumber SMALLINT,
-    @DateOfReservation DATE,
-    @Status TINYINT,
-    @Raw NVARCHAR(MAX),
+    @Raw VARCHAR(MAX),
+    @DT DATETIME2,
+    @ValidationResult INT,
     @Result TINYINT OUTPUT,
     @ResultText NVARCHAR(MAX) OUTPUT
 AS
 BEGIN
     BEGIN TRY
         -- Insert the record into RequestResults table
-        INSERT INTO RequestResults (clientName, clientPhone, TableNumber, DateOfReservation, Status, Raw)
-        VALUES (@clientName, @clientPhone, @TableNumber, @DateOfReservation, @Status, @Raw);
+        INSERT INTO RequestResults (Raw, DT, ValidationResult)
+        VALUES (@Raw, @DT, @ValidationResult);
 
         -- Set output parameters for success
         SET @Result = 1;

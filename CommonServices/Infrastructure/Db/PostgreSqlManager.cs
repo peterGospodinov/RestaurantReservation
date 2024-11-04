@@ -1,29 +1,29 @@
-﻿using System;
-using System.Data;
-using System.Data.SqlClient;
+﻿using System.Data;
 using System.Reflection;
+using System;
+using Npgsql;
 using System.Threading.Tasks;
 
 namespace CommonServices.Infrastructure.Db
 {
-    public class SqlServerManager : IDatabaseManager
+    public class PostgreSqlManager : IDatabaseManager
     {
         private readonly string _connectionString;
 
-        public SqlServerManager(string connectionString)
+        public PostgreSqlManager(string connectionString)
         {
             _connectionString = connectionString;
         }
 
         public async Task ExecuteStoredProcedureAsync<TModel>(string storedProcedureName, TModel model) where TModel : class
         {
-            using (var connection = new SqlConnection(_connectionString))
+            using (var connection = new NpgsqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
 
-                using (var command = new SqlCommand(storedProcedureName, connection))
+                using (var command = new NpgsqlCommand($"CALL {storedProcedureName.ToLower()}", connection))
                 {
-                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandType = CommandType.Text;
 
                     // Loop through model properties and add them as parameters
                     foreach (PropertyInfo prop in model.GetType().GetProperties())
@@ -34,27 +34,31 @@ namespace CommonServices.Infrastructure.Db
                         if (prop.PropertyType == typeof(byte) && prop.Name == "Result" ||
                             prop.PropertyType == typeof(string) && prop.Name == "ResultText")
                         {
-                            var sqlParam = new SqlParameter(prop.Name, prop.PropertyType == typeof(byte) ? SqlDbType.TinyInt : SqlDbType.NVarChar)
+                            // Add output parameters
+                            var npgsqlParam = new NpgsqlParameter(prop.Name.ToLower(), prop.PropertyType == typeof(byte) ? DbType.Byte : DbType.String)
                             {
                                 Direction = ParameterDirection.Output,
                                 Size = prop.PropertyType == typeof(string) ? 255 : 0
                             };
-                            command.Parameters.Add(sqlParam);
+                            command.Parameters.Add(npgsqlParam);
                         }
                         else
                         {
-                            command.Parameters.AddWithValue(prop.Name, paramValue ?? DBNull.Value);
+                            // Add input parameters
+                            command.Parameters.AddWithValue(prop.Name.ToLower(), paramValue ?? DBNull.Value);
                         }
                     }
 
+                    // Execute the stored procedure
                     await command.ExecuteNonQueryAsync();
 
-                    foreach (SqlParameter sqlParam in command.Parameters)
+                    // Retrieve output values and set them back to the model
+                    foreach (NpgsqlParameter npgsqlParam in command.Parameters)
                     {
-                        var prop = model.GetType().GetProperty(sqlParam.ParameterName);
-                        if (prop != null && sqlParam.Direction == ParameterDirection.Output)
+                        var prop = model.GetType().GetProperty(npgsqlParam.ParameterName);
+                        if (prop != null && npgsqlParam.Direction == ParameterDirection.Output)
                         {
-                            prop.SetValue(model, sqlParam.Value == DBNull.Value ? null : sqlParam.Value);
+                            prop.SetValue(model, npgsqlParam.Value == DBNull.Value ? null : npgsqlParam.Value);
                         }
                     }
                 }

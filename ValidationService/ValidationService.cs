@@ -1,15 +1,24 @@
 ﻿using CommonServices.Domain.Enums;
+using CommonServices.Domain.Models;
 using CommonServices.Infrastructure.Db;
 using CommonServices.Infrastructure.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
 
 
 namespace ValidationService
 {
     class Program
     {
-        static void Main(string[] args)
+        private ConcurrentQueue<MessageModel> _messageQueue = new ConcurrentQueue<MessageModel>();
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(10); // Controls the maximum number of concurrent tasks
+
+
+        static async Task Main(string[] args)
         {
+            const string AppName = "ValidationService";
+
             // Setup Dependency Injection
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<IFileLogger>(provider => new FileLogger())
@@ -20,47 +29,68 @@ namespace ValidationService
 
             //Create Log messages thread-safe FIFO collection
             var logMessagesCollection = new List<string>();
-            logMessagesCollection.Add("Validation service started_1");
-            logMessagesCollection.Add("Validation service started_2");
-            logMessagesCollection.Add("Validation service started_3");
-            logMessagesCollection.Add("Validation service started_4");
-            logMessagesCollection.Add("Validation service started_5");
-            logMessagesCollection.Add("Validation service started_6");
-            logMessagesCollection.Add("Validation service started_7");
-            logMessagesCollection.Add("Validation service started_8");
-            logMessagesCollection.Add("Validation service started_9");
-            logMessagesCollection.Add("Validation service started_10");
-            logMessagesCollection.Add("Validation service started_11");
-            logMessagesCollection.Add("Validation service started_12");
+           
+ 
+            
+           
+        
 
+            //private ConcurrentQueue<Message> _messageQueue = new ConcurrentQueue<Message>();
 
-            // Run logging in a new background task
-            //This combination of ConcurrentQueue and SemaphoreSlim ensures that log messages are safely enqueued
-            //by multiple tasks and processed in a thread-safe, FIFO manner,
-            //with only one thread writing to the file at a time.
-            Thread.Sleep(2000);
-            Task.Run(() => logger?.LogAsync(logMessagesCollection)).Wait();
-            Task.Run(() => logger?.LogAsync(new List<string> { "Another action started" }));
+            //end of initialization here
 
-            //Lets do SQL things.
-            string sqlConnectionString = "Server=mssql:1433;Database=Reservations;User Id=sa;Password=MyStrongS1rootP@ssword;";
-            var dbManager = DatabaseManagerFactory.CreateDatabaseManager(DatabaseType.SqlServer, sqlConnectionString);
-
-            var model = new InsertRequestResultModel
+            var model = new StoreResultToDb
             {
-                ClientName = "John Doe",
-                ClientPhone = "1234567890",
-                TableNumber = 5,
-                DateOfReservation = DateTime.Now,
-                Status = 1,
-                Raw = "Sample raw data"
+                Raw = "Sample raw data",
+                Dt = DateTime.Now,
+                ValidationResult = 9               
             };
 
-            //insert result
-            //dbManager.ExecuteStoredProcedure("sp_InsertRequestResult", model);
-          
-            Task.Run(() => logger?.LogAsync(new List<string> {$"Result: {model.Result}",$"Result: {model.Result}"}));
+            //idva msg... dobavia se v edna colecsia... prawi all this things... i nakraq se trie.
+            
 
-        }
+            //MSSQL Insert
+            try
+            {
+                string sqlConnectionString = "Server=localhost,1433;Database=Reservations;User Id=sa;Password=MyStrongS1rootP@ssword;TrustServerCertificate=true";
+                var dbManager = DatabaseManagerFactory.CreateDatabaseManager(DatabaseType.SqlServer, sqlConnectionString);
+                await dbManager.ExecuteStoredProcedureAsync("sp_InsertRequestResult", model);
+                if (model.Result == 1)
+                {
+                    logMessagesCollection.Add("Request result inserted successfully");
+                }
+                else
+                {
+                    logMessagesCollection.Add(AppName + " " + model.ResultText);
+                }
+            }
+            catch (Exception ex)
+            {
+                logMessagesCollection.Add(AppName + " " + ex.Message);
+            };
+
+            //POSTGRESQL Insert
+            try
+            {
+                string pgConnectionString = "Host=localhost;Port=5432;Database=Reservations;Username=postgres;Password=YourStrong@Passw0rd";
+                var dbManager = DatabaseManagerFactory.CreateDatabaseManager(DatabaseType.PostgreSql, pgConnectionString);
+                await dbManager.ExecuteStoredProcedureAsync("sp_insertrequestresult", model);
+                if (model.Result == 1)
+                {
+                    logMessagesCollection.Add("Request result inserted successfully");
+                }
+                else
+                {
+                    logMessagesCollection.Add(AppName + " " + model.ResultText);
+                }
+            }
+            catch (Exception ex)
+            {
+                logMessagesCollection.Add(AppName + " " + ex.Message);
+            };
+
+            await logger?.LogAsync(logMessagesCollection);                       
+        }       
+
     }
 }

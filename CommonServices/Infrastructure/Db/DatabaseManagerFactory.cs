@@ -11,8 +11,8 @@ namespace CommonServices.Infrastructure.Db
             {
                 case DatabaseType.SqlServer:
                     return new SqlServerManager(connectionString);
-                //case DatabaseType.PostgreSql: unbcomment when PostgreSqlManager is implemented
-                //   return new PostgreSqlManager(connectionString);
+                case DatabaseType.PostgreSql:
+                    return new PostgreSqlManager(connectionString);
                 default:
                     throw new ArgumentException("Invalid database type.");
             }

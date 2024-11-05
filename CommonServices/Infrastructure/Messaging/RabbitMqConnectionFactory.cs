@@ -7,11 +7,9 @@ namespace CommonServices.Infrastructure.Messaging
     {
         private readonly ConnectionFactory _factory;
 
-        public RabbitMqConnectionFactory(ConnectionFactory factory, string userName, string password)
+        public RabbitMqConnectionFactory(ConnectionFactory factory)
         {
             _factory = factory;
-            _factory.UserName = userName;
-            _factory.Password = password;
         }
 
         public IConnection CreateConnection()

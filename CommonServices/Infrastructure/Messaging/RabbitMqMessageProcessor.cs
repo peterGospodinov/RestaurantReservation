@@ -1,8 +1,10 @@
 ﻿using CommonServices.Domain.Models;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using System;
 using System.Collections.Concurrent;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,42 +16,57 @@ namespace CommonServices.Infrastructure.Messaging
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(10); // Controls the maximum number of concurrent tasks
         private readonly IRabbitMqConnectionFactory _connectionFactory;
+        private readonly string _queueName;
+        private readonly string _replyToQueue;
 
-        public RabbitMqMessageProcessor(IRabbitMqConnectionFactory connectionFactory)
+        public RabbitMqMessageProcessor(IRabbitMqConnectionFactory connectionFactory,
+            string queueName, 
+            string replyToQueue)
         {
             _connectionFactory = connectionFactory;
+            _queueName = queueName;
+            _replyToQueue = replyToQueue;
+            //EnsureQueueExists(_queueName);
         }
 
         public void StartProducer(CancellationToken token, Action<MessageModel> messageHandler)
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
-            using (var connection = factory.CreateConnection())
+            using (var connection = _connectionFactory.CreateConnection())
             {
                 using (var channel = connection.CreateModel())
                 {
                     var consumer = new RabbitMQ.Client.Events.EventingBasicConsumer(channel);
 
                     consumer.Received += (model, ea) =>
-                    {
-                        var body = ea.Body.ToArray();
-                        var messageContent = Encoding.UTF8.GetString(body);
-                        var message = new MessageModel
+                    {                      
+                        try
                         {
-                            Content = messageContent,
-                            CorrelationId = ea.BasicProperties.CorrelationId,
-                            ReplyTo = ea.BasicProperties.ReplyTo
-                        };
+                            // Deserialize message content
+                            var body = ea.Body.ToArray();
+                            var messageContentJson = Encoding.UTF8.GetString(body);
+                            var message = JsonConvert.DeserializeObject<MessageModel>(messageContentJson);
+                          
+                            message.CorrelationId = string.IsNullOrEmpty(message.CorrelationId)
+                                ? ea.BasicProperties.CorrelationId
+                                : message.CorrelationId;
+                            message.ReplyTo = string.IsNullOrEmpty(message.ReplyTo)
+                                ? _replyToQueue
+                                : message.ReplyTo;
 
-                        // Delegate message handling to the provided handler
-                        messageHandler(message);
+                            messageHandler(message);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error processing received message: {ex.Message}");                           
+                        }
                     };
-
-                    channel.BasicConsume(queue: "your-queue",
-                                         autoAck: false,
+ 
+                    channel.BasicConsume(queue: _queueName,
+                                         autoAck: true,
                                          consumer: consumer);
                 }
             }
-            
+
             while (!token.IsCancellationRequested)
             {
                 // Keep running until cancelled
@@ -79,9 +96,28 @@ namespace CommonServices.Infrastructure.Messaging
             }
         }
 
+        public void EnqueueMessage(MessageModel message)
+        {
+            _messageQueue.Enqueue(message);
+        }
+
+
         public void StopProcessing()
         {
             _cancellationTokenSource.Cancel();
+        }
+
+        private void EnsureQueueExists(string queueName)
+        {
+            using (var connection = _connectionFactory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {              
+                channel.QueueDeclare(queue: queueName,
+                                     durable: true,
+                                     exclusive: false,
+                                     autoDelete: false,
+                                     arguments: null);
+            }
         }
     }
 }

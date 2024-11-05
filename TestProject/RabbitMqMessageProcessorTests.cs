@@ -48,7 +48,7 @@ namespace TestProject
         public void StartProducer_Should_Call_MessageHandler_When_Message_Received()
         {
             // Arrange
-            var processor = new RabbitMqMessageProcessor(_mockConnectionFactory.Object);
+            var processor = new RabbitMqMessageProcessor(_mockConnectionFactory.Object, "baseQ", "ReplayQ");
 
             bool messageHandlerCalled = false;
 
@@ -60,7 +60,7 @@ namespace TestProject
             var consumer = new EventingBasicConsumer(_mockChannel.Object);
 
             _basicProperties.CorrelationId = "123";
-            _basicProperties.ReplyTo = "reply-queue";
+            _basicProperties.ReplyTo = "ReplayQ";
 
             consumer.Received += (model, ea) =>
             {

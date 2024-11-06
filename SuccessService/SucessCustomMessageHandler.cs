@@ -3,23 +3,18 @@ using CommonServices.Domain.Models;
 using CommonServices.Domain.Queue;
 using CommonServices.Infrastructure.Db;
 using CommonServices.Infrastructure.Logging;
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 
-namespace ValidationService
+namespace SuccessService
 {
-
-    public class CustomMessageHandler
+    public class SucessCustomMessageHandler
     {
         private readonly IFileLogger _fileLogger;
         private readonly string _appName;
         private readonly List<string> _logMessagesCollection;
         private readonly IDatabaseManager _dbManager;
         private readonly DatabaseType _databaseType;
-        private readonly Validator validator;
 
-        public CustomMessageHandler(IFileLogger fileLogger,
+        public SucessCustomMessageHandler(IFileLogger fileLogger,
             string appName,
             string sqlConnectionString,
             DatabaseType databaseType)
@@ -28,65 +23,40 @@ namespace ValidationService
             _appName = appName;
             _logMessagesCollection = new List<string>();
             _dbManager = DatabaseManagerFactory.CreateDatabaseManager(_databaseType, sqlConnectionString);
-            validator = new Validator();
         }
 
-        
+
         public async Task<MessageModel> HandleMessageAsync(MessageModel message)
         {
             Console.WriteLine($"Message with Id: {message.CorrelationId} was received");
             await LogAsync($"Message with Id: {message.CorrelationId} and Content: {message.Content} was received");
 
-            var result = validator.ValidateContent(message);
-  
             var storeResultToDb = new StoreResultToDb
             {
                 Dt = DateTime.Now,
                 Raw = message.Content,
-                ValidationResult = result.ValidationResult,            
+                ValidationResult = message.ValidationResult,
             };
-            
-            if (message.RoutingKey == RabbitMqRoutingKeys.Validate.ToString())
-            {
-                await StoreInDatabaseAsync(storeResultToDb, "sp_InsertValidatedMessage");
 
-                string forwardToQueue = message.ForwardToQueue;
-                if (result.ValidationResult == 0)
-                {
-                    forwardToQueue = QueueNames.Fail.Receive;
-                }
-                else if (result.ValidationResult == 9)
-                {
-                    forwardToQueue = QueueNames.Success.Receive;
-                }
+            await StoreInDatabaseAsync(storeResultToDb, "sp_InsertSucessMessage");
 
-                return new MessageModel
-                {
-                    Content = message.Content,
-                    CorrelationId = message.CorrelationId,
-                    RoutingKey = RabbitMqRoutingKeys.Success.ToString(),
-                    ValidationResult = result.ValidationResult,           
-                    ForwardToQueue = forwardToQueue
-                };
-            }
-            else if (message.RoutingKey == RabbitMqRoutingKeys.Success.ToString())
-            {
-                await StoreInDatabaseAsync(storeResultToDb, "sp_InsertSucessResponceMessage");
-                return null;
-            }
-            else
-            {
-                return null;
-            }
-            
-            //return null;
-        } 
-        
+            string replyToQueue = QueueNames.Validation.Receive;
+
+            return new MessageModel
+            {              
+                CorrelationId = message.CorrelationId,
+                RoutingKey = RabbitMqRoutingKeys.Success.ToString(),
+                Content = message.Content,
+                ValidationResult = message.ValidationResult,     
+                ReplyToQueue = replyToQueue
+            };
+        }
+
 
         private async Task StoreInDatabaseAsync(StoreResultToDb model, string storedProcedureName)
         {
             try
-            {             
+            {
                 await _dbManager.ExecuteStoredProcedureAsync(storedProcedureName, model);
                 if (model.Result == 1)
                 {

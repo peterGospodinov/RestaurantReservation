@@ -97,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Domain\Enums\DatabaseType.cs" />
+    <Compile Include="Domain\Enums\RabbitMqRoutingKeys.cs" />
     <Compile Include="Domain\Models\MessageContentModel.cs" />
     <Compile Include="Domain\Models\StoreResultToDb.cs" />
     <Compile Include="Domain\Models\MessageModel.cs" />

@@ -68,7 +68,7 @@ namespace TestProject
                 {
                     Content = Encoding.UTF8.GetString(ea.Body.ToArray()),
                     CorrelationId = ea.BasicProperties?.CorrelationId,
-                    ReplyTo = ea.BasicProperties?.ReplyTo
+                    ReplyToQueue = ea.BasicProperties?.ReplyTo
                 });
             };
 

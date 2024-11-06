@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CommonServices.Domain.Models
+﻿namespace CommonServices.Domain.Models
 {
     public class MessageModel
     {
-        public string Content { get; set; }
+       
         public string CorrelationId { get; set; }
-        public string ReplyTo { get; set; }
+        public string RoutingKey { get; set; }
+        public string ReplyToQueue { get; set; }
+        public string ForwardToQueue { get; set; }
+        public string Content { get; set; }
+        public int ValidationResult { get; set; }
     }
 }

@@ -33,10 +33,10 @@ namespace ValidationService
                     return messageContent;
                 }
 
-                if (string.IsNullOrEmpty(messageContent.NumberOfReservedTable))
+                if (messageContent.NumberOfReservedTable <= 0)
                 {
                     messageContent.ValidationResult = 0;
-                    messageContent.ResultText = "Number Of ReservedTable is required.";
+                    messageContent.ResultText = "Number Of ReservedTable must be greater than zero.";
                     return messageContent;
                 }
 

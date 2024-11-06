@@ -3,14 +3,14 @@ CREATE DATABASE Reservations;
 \c Reservations
 
 -- Create the RequestResults table
-CREATE TABLE IF NOT EXISTS RequestResults (
+CREATE TABLE IF NOT EXISTS FailMessages (
     Id SERIAL PRIMARY KEY,
 	Raw TEXT,
 	Dt TIMESTAMP,
 	ValidationResult INT -- 0:Fail, -9:OK
 );
 
-CREATE OR REPLACE PROCEDURE sp_InsertRequestResult(   
+CREATE OR REPLACE PROCEDURE sp_InsertFailMessage(   
     IN Raw TEXT,
     Dt TIMESTAMP,
     ValidationResult INT,
@@ -22,7 +22,7 @@ AS $$
 BEGIN
     -- Attempt to insert the data
     BEGIN
-        INSERT INTO RequestResults (Raw,Dt,ValidationResult)
+        INSERT INTO FailMessages (Raw,Dt,ValidationResult)
         VALUES (Raw,Dt,ValidationResult);
 
         -- Set output parameters for success

@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
 
 namespace CommonServices.Infrastructure.Messaging
 {

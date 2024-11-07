@@ -4,7 +4,6 @@ using Moq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
-using Windows.Storage.FileProperties;
 
 namespace TestProject
 {
@@ -48,7 +47,7 @@ namespace TestProject
         public void StartProducer_Should_Call_MessageHandler_When_Message_Received()
         {
             // Arrange
-            var processor = new RabbitMqMessageProcessor(_mockConnectionFactory.Object, "baseQ", "ReplayQ");
+            var processor = new MessageProcessor(_mockConnectionFactory.Object, "baseQ");
 
             bool messageHandlerCalled = false;
 

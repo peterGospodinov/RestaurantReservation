@@ -3,7 +3,6 @@ using CommonServices.Domain.Queue;
 using CommonServices.Infrastructure.Logging;
 using CommonServices.Infrastructure.Messaging;
 using FailService;
-using RabbitMQ.Client;
 
 class Program
 {
@@ -40,10 +39,8 @@ class Program
             e.Cancel = true;
         };
 
-
         // Start producer with a handler that enqueues messages
         Task producerTask = Task.Run(() => messageProcessor.StartProducer(CancellationToken.None, ((MessageProcessor)messageProcessor).EnqueueMessage));
-
 
         // Start consumers with the dynamic message handling logic
         Task consumerTask = Task.Run(() => messageProcessor.StartConsumers(CancellationToken.None, messageHandler.HandleMessageAsync));

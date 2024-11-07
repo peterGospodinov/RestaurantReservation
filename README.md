@@ -22,7 +22,7 @@ The system handles customer reservation requests asynchronously, ensuring non-bl
 - **Messaging Queue**: RabbitMQ
 - **Databases**: MSSQL, PostgreSQL
 - **Database Access**: ADO.NET Library for database connectivity and data access
-- **Tools and Libraries**: Newtonsoft.Json for serialization, RabbitMQ.Client, ADO for lightweight database access, and a custom **Common Library** for managing database operations.
+- **Tools and Libraries**: Newtonsoft.Json for serialization, RabbitMQ.Client, ADO for lightweight database access.
 
 ## Architecture Overview
 

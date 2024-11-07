@@ -3,9 +3,6 @@ using CommonServices.Domain.Models;
 using CommonServices.Domain.Queue;
 using CommonServices.Infrastructure.Db;
 using CommonServices.Infrastructure.Logging;
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 
 namespace ValidationService
 {
@@ -83,8 +80,7 @@ namespace ValidationService
                 return null;
             }
          
-        } 
-        
+        }       
 
         private async Task StoreInDatabaseAsync(StoreResultToDb model, string storedProcedureName)
         {

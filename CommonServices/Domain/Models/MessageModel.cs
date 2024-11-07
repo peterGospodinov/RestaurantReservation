@@ -2,7 +2,6 @@
 {
     public class MessageModel
     {
-       
         public string CorrelationId { get; set; }
         public string RoutingKey { get; set; }
         public string ReplyToQueue { get; set; }

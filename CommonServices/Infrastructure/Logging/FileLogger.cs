@@ -22,8 +22,7 @@ namespace CommonServices.Infrastructure.Logging
         {
             _logFilePath = logFilePath;
             Directory.CreateDirectory(Path.GetDirectoryName(_logFilePath) ?? string.Empty);
-
-            // Initialize the log queue and semaphore using semaphoreSlim
+   
             _logQueue = new ConcurrentQueue<string>();
             _semaphore = new SemaphoreSlim(1, 1);
         }
@@ -36,20 +35,17 @@ namespace CommonServices.Infrastructure.Logging
                 _logQueue.Enqueue($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}");
             }
 
-            // Start processing the queue if not already in process
             await ProcessLogQueueAsync();
         }
 
         private async Task ProcessLogQueueAsync()
-        {
-            // Ensure only one process is handling the queue at a time
+        {          
             await _semaphore.WaitAsync();
             try
             {
                 if (_isProcessing) return;
                 _isProcessing = true;
-
-                // Process the queue until all messages are written
+             
                 while (_logQueue.TryDequeue(out var logEntry))
                 {
                     await WriteLogAsync(logEntry);

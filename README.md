@@ -37,6 +37,7 @@ The architecture consists of the following components:
 ## Getting Started
 
 To see the project working, you need to start all three console applications: **ValidationService**, **SuccessService**, and **FailService**.
+There is also an RQMessageSender console application that you can use to send custom messages to the main validation queue.
 
 ### Prerequisites
 

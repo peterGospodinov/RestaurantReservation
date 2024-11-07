@@ -37,7 +37,7 @@ The architecture consists of the following components:
 ## Getting Started
 
 To see the project working, you need to start all three console applications: **ValidationService**, **SuccessService**, and **FailService**.
-There is also an RQMessageSender console application that you can use to send custom messages to the main validation queue.
+There is also an **RQMessageSender** console application that you can use to send custom messages to the main validation queue.
 
 ### Prerequisites
 
@@ -57,7 +57,7 @@ There is also an RQMessageSender console application that you can use to send cu
     
      docker-compose up -d
     
-   - The `docker-compose.yml` file includes all the necessary services and also runs an `initmssql.sql` and 'initpostgresql.sql' script to automatically create the required tables and stored procedures.
+   - The `docker-compose.yml` file includes all the necessary services and also runs an `initmssql.sql` and `initpostgresql.sql` script to automatically create the required tables and stored procedures.
 
 3. **Service Configuration**
    - All configuration settings are default and hardcoded within the application. No additional configuration files are required.

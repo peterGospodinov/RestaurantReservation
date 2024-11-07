@@ -8,6 +8,7 @@ The system handles customer reservation requests asynchronously, ensuring non-bl
 
 ## Features
 
+- **Factory Design Pattern**: The **DatabaseManagerFactory** uses the Factory Design Pattern to create instances of database managers based on the database type.   
 - **RabbitMQ Integration**: Message queue setup for efficient processing of customer reservations.
 - **Asynchronous Processing**: Use of `async/await` to enable non-blocking task execution.
 - **Multi-threading**: Demonstrates usage of threads for parallel processing to improve system throughput.
@@ -20,7 +21,7 @@ The system handles customer reservation requests asynchronously, ensuring non-bl
 - **Backend**: C#, .NET 8
 - **Messaging Queue**: RabbitMQ
 - **Databases**: MSSQL, PostgreSQL
-- **ORM**: ADO Library
+- **Database Access**: ADO.NET Library for database connectivity and data access
 - **Tools and Libraries**: Newtonsoft.Json for serialization, RabbitMQ.Client, ADO for lightweight database access, and a custom **Common Library** for managing database operations.
 
 ## Architecture Overview

@@ -28,6 +28,10 @@ The system handles customer reservation requests asynchronously, ensuring non-bl
 
 The architecture consists of the following components:
 
+### Message Organization
+- **Exchange Type**: The system uses `ExchangeType.Direct` with durable exchanges set to `true`, ensuring that messages are persistent and not lost in case of broker restarts.
+- **Routing Keys**: Routing keys are used to direct different types of messages to specific queues. This allows multiple message types to be handled within the same queue.
+
 1. **Validation Service**: A console application that consumes messages from RabbitMQ, validates message data, and publishes results to the appropriate queues. 
 2. **Success Service**: A console application that consumes validated messages from the `Success_RabbitMQ` queue and saves them in MSSQL using a stored procedure. When the stored procedure succeeds, the service provides feedback to the Validation Service.
 3. **Fail Service**: A console application that consumes failed validation messages from the `Fail_RabbitMQ` queue and saves them in PostgreSQL.

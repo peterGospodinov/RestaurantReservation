@@ -14,34 +14,33 @@ namespace SuccessService
             const string SqlConnectionString = "Server=localhost,1433;Database=Reservations;User Id=sa;Password=MyStrongS1rootP@ssword;TrustServerCertificate=true";
             const string Qname = QueueNames.Success.Receive;        
 
-            var connectionFactory = new ConnectionFactory
+            var connectionFactory = new RabbitMQ.Client.ConnectionFactory
             {
                 HostName = "localhost",
                 UserName = "user",
                 Password = "password"
             };
 
-            IRabbitMqConnectionFactory rabbitMqConnectionFactory = new RabbitMqConnectionFactory(connectionFactory);
+            CommonServices.Infrastructure.Messaging.IConnectionFactory rabbitMqConnectionFactory = new CommonServices.Infrastructure.Messaging.ConnectionFactory(connectionFactory);
 
-            IMessageProcessor messageProcessor = new RabbitMqMessageProcessor(rabbitMqConnectionFactory, Qname);
+            IMessageProcessor messageProcessor = new MessageProcessor(rabbitMqConnectionFactory, Qname);
 
             IFileLogger fileLogger = new FileLogger();
 
             var messageHandler = new SucessCustomMessageHandler(fileLogger, AppName, SqlConnectionString, DatabaseType.SqlServer);
 
-            // Create a cancellation token source to manage stopping the service
             var cancellationTokenSource = new CancellationTokenSource();
             var token = cancellationTokenSource.Token;
             Console.CancelKeyPress += (sender, e) =>
             {
                 Console.WriteLine("Cancellation requested...");
                 cancellationTokenSource.Cancel();
-                e.Cancel = true; // Prevents immediate termination
+                e.Cancel = true;
             };
 
 
             // Start producer with a handler that enqueues messages
-            Task producerTask = Task.Run(() => messageProcessor.StartProducer(CancellationToken.None, ((RabbitMqMessageProcessor)messageProcessor).EnqueueMessage));
+            Task producerTask = Task.Run(() => messageProcessor.StartProducer(CancellationToken.None, ((MessageProcessor)messageProcessor).EnqueueMessage));
 
 
             // Start consumers with the dynamic message handling logic

@@ -10,12 +10,12 @@ CREATE TABLE IF NOT EXISTS FailMessages (
 	ValidationResult INT -- 0:Fail, -9:OK
 );
 
-CREATE OR REPLACE PROCEDURE sp_InsertFailMessage(   
-    IN Raw TEXT,
-    Dt TIMESTAMP,
-    ValidationResult INT,
-    OUT Result SMALLINT,
-    OUT ResultText TEXT
+CREATE OR REPLACE PROCEDURE sp_insertfailmessage(   
+    in raw TEXT,
+    dt TIMESTAMP,
+    validationresult INT,
+    OUT result SMALLINT,
+    OUT resultText TEXT
 )
 LANGUAGE plpgsql
 AS $$
@@ -23,16 +23,16 @@ BEGIN
     -- Attempt to insert the data
     BEGIN
         INSERT INTO FailMessages (Raw,Dt,ValidationResult)
-        VALUES (Raw,Dt,ValidationResult);
+        VALUES (raw,dt,validationresult);
 
         -- Set output parameters for success
-        Result := 1;
-        ResultText := 'Record inserted successfully.';
+        result := 1;
+        resulttext := 'Record inserted successfully.';
     EXCEPTION
         WHEN OTHERS THEN
             -- Set output parameters for error
-            Result := 0;
-            ResultText := SQLERRM;
+            result := 0;
+            resulttext := SQLERRM;
     END;
 END;
 $$;

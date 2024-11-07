@@ -19,8 +19,9 @@ namespace CommonServices.Infrastructure.Db
         {
             using (var connection = new NpgsqlConnection(_connectionString))
             {
-                await connection.OpenAsync();
 
+                await connection.OpenAsync();
+        
                 using (var command = new NpgsqlCommand($"CALL {storedProcedureName.ToLower()}", connection))
                 {
                     command.CommandType = CommandType.Text;
@@ -49,8 +50,14 @@ namespace CommonServices.Infrastructure.Db
                         }
                     }
 
-                    // Execute the stored procedure
-                    await command.ExecuteNonQueryAsync();
+                    try
+                    {
+                        // Execute the stored procedure
+                        await command.ExecuteNonQueryAsync();
+                    }
+                    catch (Exception ex)
+                    { 
+                    };
 
                     // Retrieve output values and set them back to the model
                     foreach (NpgsqlParameter npgsqlParam in command.Parameters)

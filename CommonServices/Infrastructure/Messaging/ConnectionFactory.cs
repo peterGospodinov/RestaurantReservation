@@ -3,11 +3,11 @@ using RabbitMQ.Client;
 
 namespace CommonServices.Infrastructure.Messaging
 {
-    public class RabbitMqConnectionFactory : IRabbitMqConnectionFactory
+    public class ConnectionFactory : IConnectionFactory
     {
-        private readonly ConnectionFactory _factory;
+        private readonly RabbitMQ.Client.ConnectionFactory _factory;
 
-        public RabbitMqConnectionFactory(ConnectionFactory factory)
+        public ConnectionFactory(RabbitMQ.Client.ConnectionFactory factory)
         {
             _factory = factory;
         }

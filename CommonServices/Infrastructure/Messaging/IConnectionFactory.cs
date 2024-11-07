@@ -2,7 +2,7 @@
 
 namespace CommonServices.Infrastructure.Messaging
 {
-    public interface IRabbitMqConnectionFactory
+    public interface IConnectionFactory
     {
         IConnection CreateConnection();
     }

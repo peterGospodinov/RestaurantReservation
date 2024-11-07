@@ -10,14 +10,14 @@ namespace TestProject
 {
     public class RabbitMqMessageProcessorTests
     {
-        private readonly Mock<IRabbitMqConnectionFactory> _mockConnectionFactory;
+        private readonly Mock<CommonServices.Infrastructure.Messaging.IConnectionFactory> _mockConnectionFactory;
         private readonly Mock<IConnection> _mockConnection;
         private readonly Mock<IModel> _mockChannel;
         private readonly IBasicProperties _basicProperties;
 
         public RabbitMqMessageProcessorTests()
         {
-            _mockConnectionFactory = new Mock<IRabbitMqConnectionFactory>();
+            _mockConnectionFactory = new Mock<CommonServices.Infrastructure.Messaging.IConnectionFactory>();
             _mockConnection = new Mock<IConnection>();
             _mockChannel = new Mock<IModel>();
 
@@ -27,7 +27,7 @@ namespace TestProject
             _mockConnection.Setup(conn => conn.CreateModel())
                            .Returns(_mockChannel.Object);
 
-            var realFactory = new ConnectionFactory
+            var realFactory = new RabbitMQ.Client.ConnectionFactory
             {
                 HostName = "localhost",    
                 UserName = "user",    

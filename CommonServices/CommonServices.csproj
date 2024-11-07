@@ -109,9 +109,9 @@
     <Compile Include="Infrastructure\Logging\FileLogger.cs" />
     <Compile Include="Infrastructure\Logging\IFileLogger.cs" />
     <Compile Include="Infrastructure\Messaging\IMessageProcessor.cs" />
-    <Compile Include="Infrastructure\Messaging\IRabbitMqConnectionFactory.cs" />
-    <Compile Include="Infrastructure\Messaging\RabbitMqConnectionFactory.cs" />
-    <Compile Include="Infrastructure\Messaging\RabbitMqMessageProcessor.cs" />
+    <Compile Include="Infrastructure\Messaging\IConnectionFactory.cs" />
+    <Compile Include="Infrastructure\Messaging\ConnectionFactory.cs" />
+    <Compile Include="Infrastructure\Messaging\MessageProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

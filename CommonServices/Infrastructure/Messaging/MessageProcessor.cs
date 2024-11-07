@@ -10,15 +10,15 @@ using System.Threading.Tasks;
 
 namespace CommonServices.Infrastructure.Messaging
 {
-    public class RabbitMqMessageProcessor : IMessageProcessor
+    public class MessageProcessor : IMessageProcessor
     {
         private readonly ConcurrentQueue<MessageModel> _messageQueue = new ConcurrentQueue<MessageModel>();
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(10); // Controls the maximum number of concurrent tasks
-        private readonly IRabbitMqConnectionFactory _connectionFactory;
+        private readonly IConnectionFactory _connectionFactory;
         private readonly string _queueName;
 
-        public RabbitMqMessageProcessor(IRabbitMqConnectionFactory connectionFactory,
+        public MessageProcessor(IConnectionFactory connectionFactory,
             string queueName)
         {
             _connectionFactory = connectionFactory;

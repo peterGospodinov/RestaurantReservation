@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuccessService", "SuccessSe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RQMessageSender", "RQMessageSender\RQMessageSender.csproj", "{AC6CECD1-2637-4AB9-B210-7DDE08D46E8C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FailService", "FailService\FailService.csproj", "{F8554795-294E-4C3B-BB58-CA7C44BE1C6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{AC6CECD1-2637-4AB9-B210-7DDE08D46E8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC6CECD1-2637-4AB9-B210-7DDE08D46E8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC6CECD1-2637-4AB9-B210-7DDE08D46E8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8554795-294E-4C3B-BB58-CA7C44BE1C6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8554795-294E-4C3B-BB58-CA7C44BE1C6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8554795-294E-4C3B-BB58-CA7C44BE1C6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8554795-294E-4C3B-BB58-CA7C44BE1C6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

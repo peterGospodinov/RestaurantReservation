@@ -16,7 +16,6 @@ namespace ValidationService
         private readonly string _appName;
         private readonly List<string> _logMessagesCollection;
         private readonly IDatabaseManager _dbManager;
-        private readonly DatabaseType _databaseType;
         private readonly Validator validator;
 
         public ValidationCustomMessageHandler(IFileLogger fileLogger,
@@ -27,7 +26,7 @@ namespace ValidationService
             _fileLogger = fileLogger;
             _appName = appName;
             _logMessagesCollection = new List<string>();
-            _dbManager = DatabaseManagerFactory.CreateDatabaseManager(_databaseType, sqlConnectionString);
+            _dbManager = DatabaseManagerFactory.CreateDatabaseManager(databaseType, sqlConnectionString);
             validator = new Validator();
         }
 

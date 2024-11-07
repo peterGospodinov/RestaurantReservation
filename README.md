@@ -8,13 +8,14 @@ The system handles customer reservation requests asynchronously, ensuring non-bl
 
 ## Features
 
-- **Factory Design Pattern**: The **DatabaseManagerFactory** uses the Factory Design Pattern to create instances of database managers based on the database type.   
 - **RabbitMQ Integration**: Message queue setup for efficient processing of customer reservations.
 - **Asynchronous Processing**: Use of `async/await` to enable non-blocking task execution.
 - **Multi-threading**: Demonstrates usage of threads for parallel processing to improve system throughput.
 - **Database Management**: Integration with **MSSQL** and **PostgreSQL** for data storage and retrieval.
 - **Validation Service**: Validates incoming reservation messages for required data, correct formats, and valid dates.
 - **Centralized Logging**: Application-level logging to help in debugging and monitoring.
+- - **Factory Design Pattern**: The **DatabaseManagerFactory** uses the Factory Design Pattern to create instances of database managers based on the database type.   
+
 
 ## Tech Stack
 

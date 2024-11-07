@@ -99,4 +99,4 @@ If you have any questions or feedback, feel free to reach out:
 
 ---
 
-Thank you for checking out this project! If you find it useful, please consider giving it a ⭐ on GitHub.
+Thank you for checking out this project!

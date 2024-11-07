@@ -29,7 +29,7 @@ namespace ValidationService
 
             IFileLogger fileLogger = new FileLogger();
 
-            var messageHandler = new CustomMessageHandler(fileLogger, AppName, SqlConnectionString, DatabaseType.SqlServer);
+            var messageHandler = new ValidationCustomMessageHandler(fileLogger, AppName, SqlConnectionString, DatabaseType.SqlServer);
 
             // Create a cancellation token source to manage stopping the service
             var cancellationTokenSource = new CancellationTokenSource();

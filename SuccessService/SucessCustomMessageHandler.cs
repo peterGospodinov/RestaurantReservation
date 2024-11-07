@@ -25,7 +25,6 @@ namespace SuccessService
             _dbManager = DatabaseManagerFactory.CreateDatabaseManager(_databaseType, sqlConnectionString);
         }
 
-
         public async Task<MessageModel> HandleMessageAsync(MessageModel message)
         {
             Console.WriteLine($"Message with Id: {message.CorrelationId} was received");
@@ -38,42 +37,44 @@ namespace SuccessService
                 ValidationResult = message.ValidationResult,
             };
 
-            await StoreInDatabaseAsync(storeResultToDb, "sp_InsertSucessMessage");
+            var isStoredSuccessfully = await StoreInDatabaseAsync(storeResultToDb, "sp_InsertSucessMessage");
 
-            string replyToQueue = QueueNames.Validation.Receive;
+            if (isStoredSuccessfully)
+            {
+                return new MessageModel
+                {
+                    CorrelationId = message.CorrelationId,
+                    RoutingKey = RabbitMqRoutingKeys.Success.ToString(),
+                    Content = message.Content,
+                    ValidationResult = message.ValidationResult,
+                    ForwardToQueue = message.ReplyToQueue
+                };
+            }
 
-            return new MessageModel
-            {              
-                CorrelationId = message.CorrelationId,
-                RoutingKey = RabbitMqRoutingKeys.Success.ToString(),
-                Content = message.Content,
-                ValidationResult = message.ValidationResult,     
-                ReplyToQueue = replyToQueue
-            };
+            return null;
         }
 
-
-        private async Task StoreInDatabaseAsync(StoreResultToDb model, string storedProcedureName)
+        private async Task<bool> StoreInDatabaseAsync(StoreResultToDb model, string storedProcedureName)
         {
             try
             {
                 await _dbManager.ExecuteStoredProcedureAsync(storedProcedureName, model);
                 if (model.Result == 1)
                 {
-
                     await LogAsync($"Request result inserted successfully.");
+                    return true;
                 }
                 else
                 {
                     await LogErrorAsync(model.ResultText);
+                    return false;
                 }
             }
             catch (Exception ex)
             {
                 await LogErrorAsync(ex.Message);
+                return false;
             };
-
-
         }
 
         private async Task LogAsync(string message)

@@ -14,7 +14,7 @@
 
         public static class Fail
         {
-            public const string Receive = " Fail_RabbitMq ";
+            public const string Receive = "Fail_RabbitMq";
         }
     }
 }

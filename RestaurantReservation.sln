@@ -19,9 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker Build", "Docker Buil
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuccessService", "SuccessService\SuccessService.csproj", "{B22DC88E-E517-4026-9F74-6F4564BA82BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RQMessageSender", "RQMessageSender\RQMessageSender.csproj", "{AC6CECD1-2637-4AB9-B210-7DDE08D46E8C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RQMessageReceiver", "RQMessageReceiver\RQMessageReceiver.csproj", "{C05D2B6D-7D12-4351-8B08-8D6F02343A7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RQMessageSender", "RQMessageSender\RQMessageSender.csproj", "{AC6CECD1-2637-4AB9-B210-7DDE08D46E8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,10 +47,6 @@ Global
 		{AC6CECD1-2637-4AB9-B210-7DDE08D46E8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC6CECD1-2637-4AB9-B210-7DDE08D46E8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC6CECD1-2637-4AB9-B210-7DDE08D46E8C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C05D2B6D-7D12-4351-8B08-8D6F02343A7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C05D2B6D-7D12-4351-8B08-8D6F02343A7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C05D2B6D-7D12-4351-8B08-8D6F02343A7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C05D2B6D-7D12-4351-8B08-8D6F02343A7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

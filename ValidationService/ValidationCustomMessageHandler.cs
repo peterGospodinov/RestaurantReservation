@@ -10,7 +10,7 @@ using System.Globalization;
 namespace ValidationService
 {
 
-    public class CustomMessageHandler
+    public class ValidationCustomMessageHandler
     {
         private readonly IFileLogger _fileLogger;
         private readonly string _appName;
@@ -19,7 +19,7 @@ namespace ValidationService
         private readonly DatabaseType _databaseType;
         private readonly Validator validator;
 
-        public CustomMessageHandler(IFileLogger fileLogger,
+        public ValidationCustomMessageHandler(IFileLogger fileLogger,
             string appName,
             string sqlConnectionString,
             DatabaseType databaseType)
@@ -34,11 +34,11 @@ namespace ValidationService
         
         public async Task<MessageModel> HandleMessageAsync(MessageModel message)
         {
-            Console.WriteLine($"Message with Id: {message.CorrelationId} was received");
-            await LogAsync($"Message with Id: {message.CorrelationId} and Content: {message.Content} was received");
+            Console.WriteLine($"Message with ID: {message.CorrelationId} has been successfully received.");
+            await LogAsync($"Message with Id: {message.CorrelationId} and Content: {message.Content} has been successfully received.");
 
             var result = validator.ValidateContent(message);
-  
+            
             var storeResultToDb = new StoreResultToDb
             {
                 Dt = DateTime.Now,
@@ -51,21 +51,26 @@ namespace ValidationService
                 await StoreInDatabaseAsync(storeResultToDb, "sp_InsertValidatedMessage");
 
                 string forwardToQueue = message.ForwardToQueue;
+                string routingKey = message.RoutingKey;
+
                 if (result.ValidationResult == 0)
                 {
                     forwardToQueue = QueueNames.Fail.Receive;
+                    routingKey = RabbitMqRoutingKeys.Fail.ToString();
                 }
                 else if (result.ValidationResult == 9)
                 {
                     forwardToQueue = QueueNames.Success.Receive;
+                    routingKey = RabbitMqRoutingKeys.Success.ToString();
                 }
 
                 return new MessageModel
                 {
                     Content = message.Content,
                     CorrelationId = message.CorrelationId,
-                    RoutingKey = RabbitMqRoutingKeys.Success.ToString(),
-                    ValidationResult = result.ValidationResult,           
+                    RoutingKey = routingKey,
+                    ValidationResult = result.ValidationResult,     
+                    ReplyToQueue = message.ReplyToQueue,
                     ForwardToQueue = forwardToQueue
                 };
             }
@@ -78,8 +83,7 @@ namespace ValidationService
             {
                 return null;
             }
-            
-            //return null;
+         
         } 
         
 

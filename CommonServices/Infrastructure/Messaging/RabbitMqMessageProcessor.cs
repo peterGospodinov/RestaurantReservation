@@ -23,7 +23,7 @@ namespace CommonServices.Infrastructure.Messaging
         {
             _connectionFactory = connectionFactory;
             _queueName = queueName;
-            EnsureQueueExists(_queueName);
+            DeclareAndBindQueue(_queueName);
         }
 
         public void StartProducer(CancellationToken token, Action<MessageModel> messageHandler)
@@ -110,7 +110,8 @@ namespace CommonServices.Infrastructure.Messaging
             IConnection connection = null;
             IModel channel = null;
             string queueName = message.ForwardToQueue;
-            EnsureQueueExists(queueName);
+
+            DeclareAndBindQueue(queueName);
 
             try
             {
@@ -124,14 +125,14 @@ namespace CommonServices.Infrastructure.Messaging
                 var properties = channel.CreateBasicProperties();
                 properties.CorrelationId = message.CorrelationId ?? Guid.NewGuid().ToString();
                 properties.ReplyTo = queueName;
-              
+                
                 // Publish the message to the queue
-                channel.BasicPublish(exchange: "",
+                channel.BasicPublish(exchange: queueName,
                                      routingKey: message.RoutingKey,
                                      basicProperties: properties,
                                      body: body);
-
-                Console.WriteLine($"Message sent to queue '{_queueName}' with CorrelationId: {properties.CorrelationId}");
+            
+                Console.WriteLine($"Message with ID: {properties.CorrelationId} was sent to the queue named '{queueName}'.");               
             }
             catch (Exception ex)
             {
@@ -139,8 +140,8 @@ namespace CommonServices.Infrastructure.Messaging
             }
             finally
             {
-                channel?.Close();
-                connection?.Close();
+                channel?.Dispose();
+                connection?.Dispose();
             }
         }
 
@@ -155,22 +156,22 @@ namespace CommonServices.Infrastructure.Messaging
             _cancellationTokenSource.Cancel();
         }
 
-        private void EnsureQueueExists(string queueName)
+        private void DeclareAndBindQueue(string queueName)
         {
             using (var connection = _connectionFactory.CreateConnection())
             using (var channel = connection.CreateModel())
-            {              
+            {
+                channel.ExchangeDeclare(exchange: queueName, type: ExchangeType.Direct, durable: true);
+
                 channel.QueueDeclare(queue: queueName,
-                                     durable: true,
-                                     exclusive: false,
-                                     autoDelete: false,
-                                     arguments: null);
+                                    durable: true,
+                                    exclusive: false,
+                                    autoDelete: false,
+                                    arguments: null);
 
-                channel.ExchangeDeclare(exchange: "shared_exchange", type: ExchangeType.Direct);
-
-                channel.QueueBind(queue: queueName, exchange: "logs", routingKey: RabbitMqRoutingKeys.Validate.ToString());
-                channel.QueueBind(queue: queueName, exchange: "logs", routingKey: RabbitMqRoutingKeys.Success.ToString());
-                channel.QueueBind(queue: queueName, exchange: "logs", routingKey: RabbitMqRoutingKeys.Fail.ToString());
+                channel.QueueBind(queue: queueName, exchange: queueName, routingKey: RabbitMqRoutingKeys.Validate.ToString());
+                channel.QueueBind(queue: queueName, exchange: queueName, routingKey: RabbitMqRoutingKeys.Success.ToString());
+                channel.QueueBind(queue: queueName, exchange: queueName, routingKey: RabbitMqRoutingKeys.Fail.ToString());
             }
         }
     }

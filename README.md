@@ -11,6 +11,7 @@ The system handles customer reservation requests asynchronously, ensuring non-bl
 - **RabbitMQ Integration**: Message queue setup for efficient processing of customer reservations.
 - **Asynchronous Processing**: Use of `async/await` to enable non-blocking task execution.
 - **Multi-threading**: Demonstrates usage of threads for parallel processing to improve system throughput.
+- **Producer-Consumer** Logic: Implements a producer that enqueues messages and a single consumer that processes messages using a **SemaphoreSlim** with a limit of 10 concurrent tasks. When the number of tasks exceeds 10, additional tasks are queued and wait until a slot becomes available, preventing system overload.
 - **Database Management**: Integration with **MSSQL** and **PostgreSQL** for data storage and retrieval.
 - **Factory Design Pattern**: The **DatabaseManagerFactory** uses the Factory Design Pattern to create instances of database managers based on the database type.   
 - **Validation Service**: Validates incoming reservation messages for required data, correct formats, and valid dates.
